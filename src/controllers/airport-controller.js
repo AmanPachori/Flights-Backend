@@ -1,17 +1,19 @@
 const { StatusCodes } = require("http-status-codes");
 
-const { AirplaneService } = require("../services");
+const { AirportService } = require("../services");
 const { SuccessResponse, ErrorResponse } = require("../utils/common");
 
 /*
- * POST : /airplanes
+ * POST : /airports
  * req.body : {modelNumber : 'Airbus 300' , capacity : 200 }
  */
-async function createAirplane(req, res) {
+async function createAirport(req, res) {
   try {
-    const airplane = await AirplaneService.createAirplane({
-      modelNumber: req.body.modelNumber,
-      capacity: req.body.capacity,
+    const airplane = await AirportService.createAirport({
+      name: req.body.name,
+      code: req.body.code,
+      address: req.body.address,
+      cityId: req.body.cityId,
     });
     SuccessResponse.data = airplane;
     return res.status(StatusCodes.CREATED).json(SuccessResponse);
@@ -22,13 +24,28 @@ async function createAirplane(req, res) {
 }
 
 /*
- * GET : /airplanes
+ * GET : /airports
  * req.body : {}
  */
 
-async function getAllAirplanes(req, res) {
+async function getAllAirport(req, res) {
   try {
-    const airplane = await AirplaneService.getAllAirplanes();
+    const airport = await AirportService.getAllAirport();
+    SuccessResponse.data = airport;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
+  } catch (error) {
+    ErrorResponse.error = error;
+    return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse);
+  }
+}
+
+/*
+ * GET : /airports/:id
+ * req.body : {}
+ */
+async function getAirport(req, res) {
+  try {
+    const airplane = await AirportService.getAirport(req.params.id);
     SuccessResponse.data = airplane;
     return res.status(StatusCodes.OK).json(SuccessResponse);
   } catch (error) {
@@ -38,28 +55,13 @@ async function getAllAirplanes(req, res) {
 }
 
 /*
- * GET : /airplanes/:id
- * req.body : {}
- */
-async function getAirplane(req, res) {
-  try {
-    const airplane = await AirplaneService.getAirplane(req.params.id);
-    SuccessResponse.data = airplane;
-    return res.status(StatusCodes.OK).json(SuccessResponse);
-  } catch (error) {
-    ErrorResponse.error = error;
-    return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse);
-  }
-}
-
-/*
- * DELETE : /airplanes/:id
+ * DELETE : /airports/:id
  * req.body : {}
  */
 
-async function deleteAirplane(req, res) {
+async function deleteAirport(req, res) {
   try {
-    const response = await AirplaneService.deleteAirplane(req.params.id);
+    const response = await AirportService.deleteAirport(req.params.id);
     SuccessResponse.data = response;
     return res.status(StatusCodes.OK).json(SuccessResponse);
   } catch (error) {
@@ -68,8 +70,8 @@ async function deleteAirplane(req, res) {
   }
 }
 module.exports = {
-  createAirplane,
-  getAllAirplanes,
-  getAirplane,
-  deleteAirplane,
+  createAirport,
+  getAllAirport,
+  getAirport,
+  deleteAirport,
 };
