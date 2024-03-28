@@ -36,6 +36,18 @@ async function createFlight(req, res) {
     return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse);
   }
 }
+
+async function getAllFlight(req, res) {
+  try {
+    const airplane = await FlightService.getAllFlight(req.query);
+    SuccessResponse.data = airplane;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
+  } catch (error) {
+    ErrorResponse.error = error;
+    return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse);
+  }
+}
 module.exports = {
   createFlight,
+  getAllFlight,
 };

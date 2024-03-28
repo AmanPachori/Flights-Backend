@@ -2,6 +2,8 @@ const { StatusCodes } = require("http-status-codes");
 
 const { FlightRepository } = require("../repositories");
 const AppError = require("../utils/errors/app-error");
+4;
+const { Op } = require("sequelize");
 
 const flightRepository = new FlightRepository();
 
@@ -25,6 +27,49 @@ async function createFlight(data) {
   }
 }
 
+async function getAllFlight(query) {
+  let customfilter = {};
+  let sortFilter = [];
+  if (query.trips) {
+    [departureAirportId, ArrivalAirportId] = query.trips.split("-");
+    customfilter.departureAirportId = departureAirportId;
+    customfilter.arrivalAirportId = ArrivalAirportId;
+  }
+
+  if (query.price) {
+    [minPrice, maxPrice] = query.price.split("-");
+    customfilter.price = {
+      [Op.between]: [minPrice, maxPrice],
+    };
+  }
+
+  if (query.travellers) {
+    customfilter.totalSeats = {
+      [Op.gte]: query.travellers,
+    };
+  }
+
+  if (query.sort) {
+    const params = query.sort.split(",");
+    let sortFilters = params.map((param) => param.split("_"));
+    sortFilter = [sortFilters];
+  }
+
+  try {
+    const flights = await flightRepository.getAllFlight(
+      customfilter,
+      sortFilter
+    );
+    return flights;
+  } catch (error) {
+    throw new AppError(
+      "Cannot Return Flight data based on your request",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
 module.exports = {
   createFlight,
+  getAllFlight,
 };
